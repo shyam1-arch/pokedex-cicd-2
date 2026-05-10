@@ -19,4 +19,4 @@ Deployed app:
 https://ci-cd-course.onrender.com
 
 Previous repository:
-https://github.com/shyam1-arch/CI-CD-Coursetest
+https://github.com/shyam1-arch/CI-CD-Course
