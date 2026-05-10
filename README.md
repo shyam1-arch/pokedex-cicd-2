@@ -13,3 +13,10 @@ Start by running `npm install` inside the project folder
 `npm run start-prod` to run your production build
 test
 Exercise 22 pull request test
+## Links
+
+Deployed app:
+https://ci-cd-course.onrender.com
+
+Previous repository:
+https://github.com/shyam1-arch/CI-CD-Course
