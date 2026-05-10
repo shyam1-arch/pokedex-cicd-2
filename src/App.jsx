@@ -1,21 +1,66 @@
-const express = require('express')
-const app = express()
+/* global process */
 
-const PORT = process.env.PORT || 5001
+import React from 'react'
+import { Routes, Route, useMatch } from 'react-router-dom'
+import { useApi } from './useApi'
+import LoadingSpinner from './LoadingSpinner'
+import ErrorMessage from './ErrorMessage'
+import PokemonPage from './PokemonPage'
+import PokemonList from './PokemonList'
 
-app.use(express.static('dist'))
+const mapResults = ({ results }) => results.map(({ url, name }) => ({
+  url,
+  name,
+  id: parseInt(url.match(/\/(\d+)\//)[1])
+}))
 
-app.get('/health', (req, res) => {
-  res.send('ok')
-})
+const App = () => {
+  const match = useMatch('/pokemon/:name')
 
-app.get('/version', (req, res) => {
-  res.send('1')
-})
+  const { data: pokemonList, error, isLoading } = useApi(
+    'https://pokeapi.co/api/v2/pokemon/?limit=50',
+    mapResults
+  )
 
-const start = async () => {
-  await app.listen(PORT)
-  console.log(`server started on port ${PORT}`)
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
+
+  if (error) {
+    return <ErrorMessage error={error} />
+  }
+
+  let next = null
+  let previous = null
+
+  if (match && match.params) {
+    const pokemonId = pokemonList.find(
+      ({ name }) => name === match.params.name
+    ).id
+
+    previous = pokemonList.find(({ id }) => id === pokemonId - 1)
+    next = pokemonList.find(({ id }) => id === pokemonId + 1)
+  }
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={<PokemonList pokemonList={pokemonList} />}
+      />
+
+      <Route
+        path="/pokemon/:name"
+        element={
+          <PokemonPage
+            pokemonList={pokemonList}
+            previous={previous}
+            next={next}
+          />
+        }
+      />
+    </Routes>
+  )
 }
 
-start()
+export default App
